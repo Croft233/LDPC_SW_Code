@@ -1,0 +1,95 @@
+clc
+clear all
+close all
+
+%Initial
+z = 28;
+H = LDPC_construct802p16e(672,336);
+n = 672;
+k = 364;
+[m,n] = size(H);
+H = H(1:end-28,:);
+for jj = 0:9
+    for ii = 1:z
+        H(ii+z+z*jj,:) = mod(H(ii+z*jj+z,:) + H(ii+z*jj,:),2);
+    end
+end
+
+P = H(: ,1:364);
+P = P';
+G = [eye(364) P];
+P1 = P(1:k/2,:);
+P2 = P((k/2)+1:k,:);
+p = 0.05;
+Prob = zeros(1,10);
+nbe_x = zeros(1,10);
+nbe_y = zeros(1,10);
+BER = zeros(1,10);
+for i = 1:10
+
+    Prob(1,i) = p;
+    e = rand(1, 672) < p;
+    %x and y generation
+    xx = randi([0,1],1,672);
+    yy_rand = randi([1,672]);
+    yy = zeros(1,672);
+    yy(1,yy_rand) = 1;
+    yy = yy + xx;
+
+    a1 = xx(1,1:k/2);
+    v1 = xx(1, (k/2)+1:k);
+    q1 = xx(1,k+1:672);
+
+    u2 = yy(1,1:k/2);
+    a2 = yy(1, (k/2)+1:k);
+    q2 = yy(1,k+1:672);
+
+    s1 = mod(a1 * P1, 2);
+    s1 = mod(s1 + q1, 2);
+    s1 = [v1 s1];
+
+    s2 = mod(a2 * P2, 2);
+    s2hat = mod(s2 + q2, 2);
+    s2 = [u2 s2hat];
+
+    t1 = [zeros(1,k/2) s1];
+    t2 = [u2 zeros(1,k/2) s2hat];
+
+    t_sum = mod(t1 + t2,2);
+    t_sum = mod(t_sum+e,2);
+
+    chat = ldpc_decoder(H, t_sum, 672);
+
+    a1hat = chat(1,1:k/2);
+    a2hat = chat(1,(k/2)+1:k);
+
+    xx_hat = [a1hat zeros(1,k/2)];
+    xx_hat = mod(xx_hat * G,2);
+    xx_hat = mod(xx_hat+t1,2);
+
+    yy_hat = [a2hat zeros(1,k/2)];
+    yy_hat = mod(yy_hat*G, 2);
+    yy_hat = mod(yy_hat+t2,2);
+
+    nbe_x(1,i) = sum(mod(xx -xx_hat,2));
+    nbe_y(1,i) = sum(mod(yy - yy_hat,2));
+    BER(1,i) = (nbe_x(1,i)+nbe_y(1,i)) / (672*2);
+
+    p = p + 0.01;
+
+end
+
+figure(1)
+plot(Prob, BER,'-o','Color','k','MarkerFaceColor','k');
+
+
+set(gca,'XLim',[0 0.15]); 
+set(gca,'XTick',[0 :0.05:0.15]);
+
+set(gca,'YLim',[1e-05 0.1]); 
+
+xlabel('Error Rate', 'FontSize', 15)
+ylabel('BER', 'FontSize', 15)
+
+
+
