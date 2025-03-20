@@ -5,7 +5,7 @@ This repository presents an enhanced study where Low-Density Parity-Check (LDPC)
 ## Overview
 
 - **Integration of LDPC Codes:**  
-  LDPC codes, known for their sparse parity-check matrices and efficient decoding (via the sum-product algorithm), are incorporated into the Slepian-Wolf framework to boost performance :contentReference[oaicite:1]{index=1}.
+  LDPC codes, known for their sparse parity-check matrices and efficient decoding (via the sum-product algorithm), are incorporated into the Slepian-Wolf framework to boost performance.
 
 - **Objectives:**  
   - To implement and evaluate an LDPC-based Slepian-Wolf coding scheme.
@@ -25,11 +25,9 @@ This repository presents an enhanced study where Low-Density Parity-Check (LDPC)
 
 ## How to Run the Simulations
 
-1. **Requirements:**  
+**Requirements:**  
    MATLAB or GNU Octave.
-2. **Instructions:**  
-   - Navigate to the `simulation/` directory.
-   - Run the provided MATLAB scripts to replicate the simulation results and performance plots.
+
 
 ## References
 
